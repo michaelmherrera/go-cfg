@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -15,16 +16,34 @@ const templateFile = "template.txt"
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	// seed, err := strconv.ParseInt(os.Args[1], 10, 32)
-	// check(err)
-	//rand.Seed(4)
+
+	argc := len(os.Args)
+
+	if argc >= 3 {
+		seed, err := strconv.ParseInt(os.Args[2], 10, 32)
+		check(err)
+		rand.Seed(seed)
+	}
+
 	cfg := make(map[string][]string)
 	parse(grammarFile, cfg, addRule)
-	parse(templateFile, cfg, recursiveGenerateHelper)
-	
+
+	var iterations int64 = 1
+	if argc >= 2 {
+		var err error
+		iterations, err = strconv.ParseInt(os.Args[1], 10, 32)
+		check(err)
+	}
+
+	var i int64
+	for i = 0; i < iterations; i++ {
+		parse(templateFile, cfg, recursiveGenerateHelper)
+		fmt.Println("")
+	}
+
 }
 
-func recursiveGenerateHelper(template string, cfg map[string][]string){
+func recursiveGenerateHelper(template string, cfg map[string][]string) {
 	line := recursiveGenerate(template, cfg)
 	fmt.Println(line)
 }
@@ -47,12 +66,12 @@ func recursiveGenerate(template string, cfg map[string][]string) string {
 				} else {
 					newtemplateElem += posNterm
 				}
-				
+
 			}
 			templateElem = newtemplateElem
 		}
 		if i != 0 {
-			generated+= " " //Add space between words
+			generated += " " //Add space between words
 		}
 		generated += templateElem
 	}
@@ -94,16 +113,5 @@ func parse(fileName string, cfg map[string][]string, fn func(string, map[string]
 
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
-	}
-}
-
-func demo() {
-	rand.Seed(time.Now().UnixNano())
-	cfg := make(map[string][]string)
-	cfg["last-names"] = []string{"Smith", "Herrera", "Goel", "Ng", "Ngozi"}
-	var length int = len(cfg["last-names"])
-	for i := 0; i <= 10; i++ {
-		index := rand.Intn(length)
-		fmt.Println(cfg["last-names"][index])
 	}
 }
