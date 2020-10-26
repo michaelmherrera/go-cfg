@@ -1,0 +1,3 @@
+<fn> <ln>
+<bld-num> <strt-name> <strt-sfx>
+<city-state> <zpcd>
